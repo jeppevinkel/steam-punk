@@ -96,6 +96,10 @@ let checkPurchases = setInterval(async () => {
     }
 }, 600000);
 
+client.on("ready", client => {
+    console.log("Damn I'm ready now!\nBtw I'm in " + client.guilds.cache.size + " guilds.");
+})
+
 client.on("guildDelete", guild => {
     client.settings.delete(guild.id);
     console.log(`Left guild: ${guild.name}`);
