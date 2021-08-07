@@ -62,6 +62,7 @@ let checkPurchases = setInterval(async () => {
                 for (const game of games) {
                     if (!client.steamHash.includes(hashId, game.appid)) {
                         console.log(steamId + " has purchased " + game.name);
+                        client.steamHash.push(hashId, game.appid);
                         purchasesToAnnounce.push({
                             steamId: steamId,
                             gameName: game.name,
@@ -110,7 +111,7 @@ client.on("guildCreate", guild => {
 });
 
 client.on("messageCreate", message => {
-    if (!message.guild || message.author.bot) return;
+    if (!message.guild || message.author.bot || (message.guild.ownerId !== message.author.id)) return;
 
     const guildConf = client.settings.get(message.guild.id);
 
