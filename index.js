@@ -155,7 +155,41 @@ client.on("messageCreate", message => {
                     }
                 }
             }
+        } else if (args[0] === "channel") {
+            if (args.length === 1) {
+                message.reply("```json\n" + JSON.stringify(guildConf.notificationChannel, null, 4) + "\n```");
+                return;
+            } else if (args[1] === "set") {
+                if (args.length === 2) {
+                    message.reply("You must provide a new channel name.");
+                    return;
+                } else {
+                    client.settings.set(message.guild.id, args[2], "notificationChannel");
+                    message.reply(`Purchase notifications will now be sent to \`${args[2]}\`.`);
+                }
+            }
+        } else if (args[0] === "prefix") {
+            if (args.length === 1) {
+                message.reply("```json\n" + JSON.stringify(guildConf.prefix, null, 4) + "\n```");
+                return;
+            } else if (args[1] === "set") {
+                if (args.length === 2) {
+                    message.reply("You must provide a new prefix.");
+                    return;
+                } else {
+                    client.settings.set(message.guild.id, args[2], "prefix");
+                    message.reply(`Command prefix has been set to \`${args[2]}\`.`);
+                }
+            }
         }
+    } else if (command === "help" || command === "h") {
+        message.reply(`Available commands:
+        \`${client.settings.get(message.guild.id, "prefix")}help\` shows this message.
+        \`${client.settings.get(message.guild.id, "prefix")}conf\` shows current configs.
+        \`${client.settings.get(message.guild.id, "prefix")}conf steamid add <id>\` adds a steamid to track purchases from.
+        \`${client.settings.get(message.guild.id, "prefix")}conf steamid rem <id>\` removes a steamid from the tracked list.
+        \`${client.settings.get(message.guild.id, "prefix")}conf channel set <channel-name>\` sets the channel to post purchases in.
+        \`${client.settings.get(message.guild.id, "prefix")}conf prefix set <command-prefix>\` sets the command prefix.`);
     }
 })
 
