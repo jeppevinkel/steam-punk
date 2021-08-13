@@ -83,7 +83,7 @@ let checkPurchases = setInterval(async () => {
                 embed.setAuthor(profile.personaname, profile.avatarmedium, profile.profileurl);
                 embed.setThumbnail(gameImgApi.replace("{appid}", purchase.appid).replace("{hash}", purchase.img_icon_url));
                 embed.setImage(gameImgApi.replace("{appid}", purchase.appid).replace("{hash}", purchase.img_logo_url));
-                embed.setDescription(`${profile.personaname} has purchased ${purchase.gameName}`);
+                embed.setDescription(`${purchase.gameName} has been added to the library`);
                 embed.setURL(storeUrl.replace("{appid}", purchase.appid));
                 embed.setTitle(purchase.gameName);
             } catch (err) {
