@@ -13,6 +13,7 @@ const gameFetchApi = `https://api.steampowered.com/IPlayerService/GetOwnedGames/
 const nameFetchApi = `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${config.steam.apiKey}&format=json&steamids={steamids}`;
 const gameImgApi = "https://media.steampowered.com/steamcommunity/public/images/apps/{appid}/{hash}.jpg";
 const storeUrl = "https://store.steampowered.com/app/{appid}/";
+const priceInfoApi = "https://store.steampowered.com/api/appdetails?appids={appids}&filters=price_overview";
 
 client.settings = new Enmap({
     name: "settings",
@@ -94,6 +95,36 @@ let checkPurchases = setInterval(async () => {
                 console.log(err);
             });
         }
+
+        fetch(priceInfoApi.replace("{appids}", purchasesToAnnounce.map(p => p.appid).join(",")), {method: "Get"})
+            .then(res => res.json())
+            .then(prices => {
+                for (const purchase of purchasesToAnnounce) {
+                    let price = prices[purchase.appid].data.price_overview;
+                    if (price === undefined || price.discount_percent === 0) continue;
+
+                    let embed = new Discord.MessageEmbed();
+                    try {
+                        embed.setAuthor("STEAM DEALS");
+                        embed.setThumbnail(gameImgApi.replace("{appid}", purchase.appid).replace("{hash}", purchase.img_icon_url));
+                        embed.setImage(gameImgApi.replace("{appid}", purchase.appid).replace("{hash}", purchase.img_logo_url));
+                        embed.setDescription(`${purchase.gameName} is currently on a ${price.discount_percent}% sale!`);
+                        embed.setURL(storeUrl.replace("{appid}", purchase.appid));
+                        embed.setTitle(purchase.gameName);
+                        embed.addField("Normal Price", `${price.initial / 100} ${price.currency}`);
+                        embed.addField("Current Price", `${price.final / 100} ${price.currency}`);
+                    } catch (err) {
+                        console.log(err);
+                    }
+
+                    channel.send({embeds: [embed]}).catch(err => {
+                        console.log(err);
+                    });
+                }
+            })
+            .catch(err => {
+                console.log(err);
+            });
     }
 }, 600000);
 
