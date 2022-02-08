@@ -281,7 +281,9 @@ client.on("messageCreate", message => {
                 }
             }
         } else if (args[0] === "rss") {
-            client.settings.ensure(message.guild.id, [], "rssFeeds");
+            if (!client.settings.has(message.guild.id, "rssFeeds")) {
+                client.settings.set(message.guild.id, [], "rssFeeds");
+            }
             if (args.length === 1) {
                 message.reply("```json\n" + JSON.stringify(guildConf.rss, null, 4) + "\n```");
                 return;
