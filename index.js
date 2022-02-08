@@ -285,16 +285,16 @@ client.on("messageCreate", message => {
                 client.settings.set(message.guild.id, [], "rssFeeds");
             }
             if (args.length === 1) {
-                message.reply("```json\n" + JSON.stringify(guildConf.rss, null, 4) + "\n```");
+                message.reply("```json\n" + JSON.stringify(guildConf.rssFeeds, null, 4) + "\n```");
                 return;
             } else if (args[1] === "add") {
-                if (args.length !== 5) {
-                    message.reply("You must provide a title, url and channel for the rss feed.");
+                if (args.length < 5) {
+                    message.reply("You must provide a url, channel and title for the rss feed.");
                     return;
                 } else {
-                    const title = args[2];
-                    const url = args[3];
-                    const channel = args[4];
+                    const title = args.slice(4, args.length).join(" ");
+                    const url = args[2];
+                    const channel = args[3];
                     const validChannels = message.guild.channels.cache.map(c => c.name);
 
                     if (!validChannels.includes(channel)) {
@@ -350,7 +350,7 @@ client.on("messageCreate", message => {
         \`${client.settings.get(message.guild.id, "prefix")}conf channel set <channel-name>\` sets the channel to post purchases in.
         \`${client.settings.get(message.guild.id, "prefix")}conf prefix set <command-prefix>\` sets the command prefix.
         \`${client.settings.get(message.guild.id, "prefix")}conf rss\` lists all rss feeds.
-        \`${client.settings.get(message.guild.id, "prefix")}conf rss add <title> <search-url> <channel-name>\` adds a steam search rss feed.
+        \`${client.settings.get(message.guild.id, "prefix")}conf rss add <search-url> <channel-name> <title>\` adds a steam search rss feed.
         \`${client.settings.get(message.guild.id, "prefix")}conf rss rem <rss-url>\` removes a steam search rss feed.`);
     }
 })
