@@ -2,6 +2,7 @@ const Discord = require("discord.js");
 const Enmap = require("enmap");
 const SteamID = require("steamid");
 const fetch = require('node-fetch');
+const rssParser = new (require('rss-parser'))();
 
 const config = require("./config.json");
 
@@ -15,6 +16,37 @@ const gameImgApi = "https://media.steampowered.com/steamcommunity/public/images/
 const storeUrl = "https://store.steampowered.com/app/{appid}/";
 const priceInfoApi = "https://store.steampowered.com/api/appdetails?appids={appids}&filters=price_overview";
 
+const rssFeed = "https://andreasaronsson.com/!rss/steam_search.php?title=Steam+Co-op+VR+Games&url=https%3A%2F%2Fstore.steampowered.com%2Fsearch%2F%3Fsort_by%3DName_ASC%26category3%3D9%26vrsupport%3D201";
+
+function extractAppId(url) {
+    const regex = /app\/(\d+)/;
+    const match = regex.exec(url);
+    if (match) {
+        return match[1];
+    }
+    return null;
+}
+
+function createRssUrl(title, searchUrl) {
+    return `https://andreasaronsson.com/!rss/steam_search.php?title=${encodeURIComponent(title)}&url=${encodeURIComponent(searchUrl)}`;
+}
+
+function isValidUrl(url) {
+    const regex = /^(http|https):\/\/[^ "]+$/;
+    return regex.test(url);
+}
+
+// (async () => {
+//
+//     let feed = await rssParser.parseURL(rssFeed);
+//     console.log(feed.title);
+//
+//     feed.items.forEach(item => {
+//         console.log('(' + extractAppId(item.link) + ') ' + item.title + ':' + item.link)
+//     });
+//
+// })();
+
 client.settings = new Enmap({
     name: "settings",
     fetchAll: false,
@@ -24,12 +56,20 @@ client.settings = new Enmap({
         prefix: "sp!",
         notificationChannel: "steam-purchases",
         steamIds: [],
+        rssFeeds: [],
     }
 });
 
 client.steamHash = new Enmap({
     name: "steamHash",
     autoEnsure: []
+});
+
+client.rssHash = new Enmap({
+    name: "rssHash",
+    autoEnsure: {
+        appsIds: []
+    }
 });
 
 let checkPurchases = setInterval(async () => {
@@ -40,6 +80,10 @@ let checkPurchases = setInterval(async () => {
         let steamIds = client.settings.get(guildId, "steamIds");
         let guild = client.guilds.cache.get(guildId);
         let channel = guild.channels.cache.find(ch => ch.name === client.settings.get(guildId, "notificationChannel"));
+        let rssFeeds = client.settings.get(guildId, "rssFeeds");
+        if (rssFeeds === undefined) {
+            rssFeeds = [];
+        }
 
         let profiles = (await (await fetch(nameFetchApi.replace("{steamids}", steamIds.join(",")), {method: "Get"})).json()).response.players.map((p) => {
             return {
@@ -125,6 +169,29 @@ let checkPurchases = setInterval(async () => {
             .catch(err => {
                 console.log(err);
             });
+
+        for (const rssFeed of rssFeeds) {
+            let channel = guild.channels.cache.find(ch => ch.name === rssFeed.channel);
+            let feed = await rssParser.parseURL(rssFeed.url);
+            let items = feed.items;
+            client.rssHash.get(guildId);
+            for (const item of items) {
+                if (item.link === undefined || item.title === undefined) continue;
+                const appId = extractAppId(item.link);
+                if (client.rssHash.includes(guildId, appId, "appsIds")) {
+                    console.log(`${item.title} has already been posted`);
+                    continue;
+                }
+
+                channel.send(`**${item.title}**\n${item.link}`)
+                    .then(() => {
+                        client.rssHash.push(guildId, appId, "appsIds");
+                    })
+                    .catch(err => {
+                    console.log(err);
+                });
+            }
+        }
     }
 }, 600000);
 
@@ -213,6 +280,64 @@ client.on("messageCreate", message => {
                     message.reply(`Command prefix has been set to \`${args[2]}\`.`);
                 }
             }
+        } else if (args[0] === "rss") {
+            client.settings.ensure(message.guild.id, [], "rssFeeds");
+            if (args.length === 1) {
+                message.reply("```json\n" + JSON.stringify(guildConf.rss, null, 4) + "\n```");
+                return;
+            } else if (args[1] === "add") {
+                if (args.length !== 5) {
+                    message.reply("You must provide a title, url and channel for the rss feed.");
+                    return;
+                } else {
+                    const title = args[2];
+                    const url = args[3];
+                    const channel = args[4];
+                    const validChannels = message.guild.channels.cache.map(c => c.name);
+
+                    if (!validChannels.includes(channel)) {
+                        message.reply("The channel you provided is not a valid channel.");
+                        return;
+                    }
+
+                    if (!isValidUrl(url)) {
+                        message.reply("The url you provided is not a valid url.");
+                        return;
+                    }
+
+                    const rssUrl = createRssUrl(title, url);
+
+                    client.settings.push(message.guild.id, {
+                        title: title,
+                        url: rssUrl,
+                        channel: channel
+                    }, "rssFeeds");
+                    message.reply("`" + title + "` has been added to the tracked list.");
+                }
+            } else if (args[1] === "rem") {
+                if (args.length !== 3) {
+                    message.reply("You must provide a valid rss feed (recognized by the rss url) to remove.");
+                    return;
+                } else {
+                    let rss = args[2];
+
+                    let rssFeeds = client.settings.get(message.guild.id, "rssFeeds");
+
+                    if (rssFeeds.length === 0) {
+                        message.reply("There are no rss feeds to remove.");
+                        return;
+                    }
+
+                    let rssFeed = rssFeeds.find(r => r.url === rss);
+
+                    if (rssFeed) {
+                        client.settings.remove(message.guild.id, rssFeed, "rssFeeds");
+                        message.reply("`" + rssFeed.title + "` removed from the tracked list.");
+                    } else {
+                        message.reply("Couldn't remove the rss feed. Are you sure it's valid and not already removed?");
+                    }
+                }
+            }
         }
     } else if (command === "help" || command === "h") {
         message.reply(`Available commands:
@@ -221,7 +346,10 @@ client.on("messageCreate", message => {
         \`${client.settings.get(message.guild.id, "prefix")}conf steamid add <id>\` adds a steamid to track purchases from.
         \`${client.settings.get(message.guild.id, "prefix")}conf steamid rem <id>\` removes a steamid from the tracked list.
         \`${client.settings.get(message.guild.id, "prefix")}conf channel set <channel-name>\` sets the channel to post purchases in.
-        \`${client.settings.get(message.guild.id, "prefix")}conf prefix set <command-prefix>\` sets the command prefix.`);
+        \`${client.settings.get(message.guild.id, "prefix")}conf prefix set <command-prefix>\` sets the command prefix.
+        \`${client.settings.get(message.guild.id, "prefix")}conf rss\` lists all rss feeds.
+        \`${client.settings.get(message.guild.id, "prefix")}conf rss add <title> <search-url> <channel-name>\` adds a steam search rss feed.
+        \`${client.settings.get(message.guild.id, "prefix")}conf rss rem <rss-url>\` removes a steam search rss feed.`);
     }
 })
 
