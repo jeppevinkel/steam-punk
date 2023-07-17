@@ -74,45 +74,45 @@ exports.default = function (client, config) {
 
 
 const commands = [
-    {
-        data: new SlashCommandBuilder()
-            .setName('conf')
-            .setDescription('Manage the configuration of the bot.')
-            .addSubcommandGroup(group =>
-                group.setName('steamid')
-                    .setDescription('Config related to Steam IDs')
-                    .addSubcommand(command =>
-                        command.setName('add')
-                            .setDescription('Add a Steam ID to track purchases from.')
-                            .addStringOption(option =>
-                                option.setName('steamid')
-                                    .setDescription('The Steam ID to add.')
-                                    .setRequired(true)))
-                    .addSubcommand(command =>
-                        command.setName('remove')
-                            .setDescription('Remove a Steam ID from the tracked list.')
-                            .addStringOption(option =>
-                                option.setName('steamid')
-                                    .setDescription('The Steam ID to remove.')
-                                    .setRequired(true))))
-            .addSubcommandGroup(group =>
-                group.setName('channel')
-                    .setDescription('Config related to the channel.')
-                    .addSubcommand(command =>
-                        command.setName('set')
-                            .setDescription('Set the channel to post purchases in.')
-                            .addChannelOption(option =>
-                                option.setName('channel')
-                                    .setDescription('The channel to post purchases in.')
-                                    .setRequired(true))))
-            .addSubcommand(command =>
-                command.setName('show')
-                    .setDescription('Show the current config.'))
-            .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
-        async execute(interaction) {
-
-        },
-    },
+    // {
+    //     data: new SlashCommandBuilder()
+    //         .setName('conf')
+    //         .setDescription('Manage the configuration of the bot.')
+    //         .addSubcommandGroup(group =>
+    //             group.setName('steamid')
+    //                 .setDescription('Config related to Steam IDs')
+    //                 .addSubcommand(command =>
+    //                     command.setName('add')
+    //                         .setDescription('Add a Steam ID to track purchases from.')
+    //                         .addStringOption(option =>
+    //                             option.setName('steamid')
+    //                                 .setDescription('The Steam ID to add.')
+    //                                 .setRequired(true)))
+    //                 .addSubcommand(command =>
+    //                     command.setName('remove')
+    //                         .setDescription('Remove a Steam ID from the tracked list.')
+    //                         .addStringOption(option =>
+    //                             option.setName('steamid')
+    //                                 .setDescription('The Steam ID to remove.')
+    //                                 .setRequired(true))))
+    //         .addSubcommandGroup(group =>
+    //             group.setName('channel')
+    //                 .setDescription('Config related to the channel.')
+    //                 .addSubcommand(command =>
+    //                     command.setName('set')
+    //                         .setDescription('Set the channel to post purchases in.')
+    //                         .addChannelOption(option =>
+    //                             option.setName('channel')
+    //                                 .setDescription('The channel to post purchases in.')
+    //                                 .setRequired(true))))
+    //         .addSubcommand(command =>
+    //             command.setName('show')
+    //                 .setDescription('Show the current config.'))
+    //         .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
+    //     async execute(interaction) {
+    //
+    //     },
+    // },
     {
         data: new SlashCommandBuilder()
             .setName('config')
