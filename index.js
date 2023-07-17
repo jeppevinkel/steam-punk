@@ -1,4 +1,4 @@
-const {Client, Events, GatewayIntentBits} = require('discord.js');
+const {Client, Events, GatewayIntentBits, EmbedBuilder} = require('discord.js');
 const Enmap = require('enmap');
 const SteamID = require('steamid');
 const fetch = require('node-fetch');
@@ -83,6 +83,7 @@ let checkPurchases = setInterval(async () => {
         let steamIds = client.settings.get(guildId, 'steamIds');
         let guild = client.guilds.cache.get(guildId);
         let channel = guild.channels.cache.get(client.settings.get(guildId, 'notificationChannelId'));
+        console.log(channel);
         let rssFeeds = client.settings.get(guildId, 'rssFeeds');
         if (rssFeeds === undefined) {
             rssFeeds = [];
@@ -126,7 +127,7 @@ let checkPurchases = setInterval(async () => {
         for (const purchase of purchasesToAnnounce) {
             let profile = profiles.find(p => p.steamid === purchase.steamId);
 
-            let embed = new Discord.MessageEmbed();
+            let embed = new EmbedBuilder();
             try {
                 embed.setAuthor(profile.personaname, profile.avatarmedium, profile.profileurl);
                 embed.setThumbnail(gameImgApi.replace('{appid}', purchase.appid).replace('{hash}', purchase.img_icon_url));
@@ -138,7 +139,7 @@ let checkPurchases = setInterval(async () => {
                 console.log(err);
             }
 
-            channel.send({embeds: [embed]}).catch(err => {
+            channel.send({embeds: [embed.toJSON()]}).catch(err => {
                 console.log(err);
             });
         }
@@ -150,7 +151,7 @@ let checkPurchases = setInterval(async () => {
                     let price = prices[purchase.appid].data.price_overview;
                     if (price === undefined || price.discount_percent === 0) continue;
 
-                    let embed = new Discord.MessageEmbed();
+                    let embed = new EmbedBuilder();
                     try {
                         embed.setAuthor('STEAM DEALS');
                         embed.setThumbnail(gameImgApi.replace('{appid}', purchase.appid).replace('{hash}', purchase.img_icon_url));
@@ -158,19 +159,24 @@ let checkPurchases = setInterval(async () => {
                         embed.setDescription(`${purchase.gameName} is currently on a ${price.discount_percent}% sale!`);
                         embed.setURL(storeUrl.replace('{appid}', purchase.appid));
                         embed.setTitle(purchase.gameName);
-                        embed.addField('Normal Price', `${price.initial / 100} ${price.currency}`);
-                        embed.addField('Current Price', `${price.final / 100} ${price.currency}`);
+                        embed.addFields({
+                            name: 'Normal Price',
+                            value: `${price.initial / 100} ${price.currency}`,
+                        }, {
+                            name: 'Current Price',
+                            value: `${price.final / 100} ${price.currency}`,
+                        });
                     } catch (err) {
-                        console.log(err);
+                        console.error(err);
                     }
 
                     channel.send({embeds: [embed]}).catch(err => {
-                        console.log(err);
+                        console.error(err);
                     });
                 }
             })
             .catch(err => {
-                console.log(err);
+                console.error(err);
             });
 
         for (const rssFeed of rssFeeds) {
@@ -196,7 +202,7 @@ let checkPurchases = setInterval(async () => {
             }
         }
     }
-}, 600000);
+}, 600);
 
 client.on(Events.ClientReady, client => {
     console.log('Damn I\'m ready now!\nBtw I\'m in ' + client.guilds.cache.size + ' guilds.');
