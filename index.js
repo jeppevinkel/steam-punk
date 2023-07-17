@@ -129,7 +129,11 @@ let checkPurchases = setInterval(async () => {
 
             let embed = new EmbedBuilder();
             try {
-                embed.setAuthor(profile.personaname, profile.avatarmedium, profile.profileurl);
+                embed.setAuthor({
+                    name: profile.personaname,
+                    iconURL: profile.avatarmedium,
+                    url: profile.profileurl,
+                });
                 embed.setThumbnail(gameImgApi.replace('{appid}', purchase.appid).replace('{hash}', purchase.img_icon_url));
                 embed.setImage(gameImgApi.replace('{appid}', purchase.appid).replace('{hash}', purchase.img_logo_url));
                 embed.setDescription(`${purchase.gameName} has been added to the library`);
@@ -139,8 +143,8 @@ let checkPurchases = setInterval(async () => {
                 console.log(err);
             }
 
-            channel.send({embeds: [embed.toJSON()]}).catch(err => {
-                console.log(err);
+            channel.send({embeds: [embed]}).catch(err => {
+                console.error(err);
             });
         }
 
@@ -153,7 +157,7 @@ let checkPurchases = setInterval(async () => {
 
                     let embed = new EmbedBuilder();
                     try {
-                        embed.setAuthor('STEAM DEALS');
+                        embed.setAuthor({name: 'STEAM DEALS'});
                         embed.setThumbnail(gameImgApi.replace('{appid}', purchase.appid).replace('{hash}', purchase.img_icon_url));
                         embed.setImage(gameImgApi.replace('{appid}', purchase.appid).replace('{hash}', purchase.img_logo_url));
                         embed.setDescription(`${purchase.gameName} is currently on a ${price.discount_percent}% sale!`);
