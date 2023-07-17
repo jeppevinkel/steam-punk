@@ -202,7 +202,7 @@ let checkPurchases = setInterval(async () => {
             }
         }
     }
-}, 600);
+}, 600000);
 
 client.on(Events.ClientReady, client => {
     console.log('Damn I\'m ready now!\nBtw I\'m in ' + client.guilds.cache.size + ' guilds.');
