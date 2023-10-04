@@ -75,7 +75,10 @@ client.rssHash = new Enmap({
     },
 });
 
-let checkPurchases = setInterval(async () => {
+let checkPurchases;
+checkGames().then(() => checkPurchases = setInterval(checkGames, 600000));
+
+async function checkGames() {
     if (!client.isReady()) return;
     console.log('Doing the game check thingy...');
 
@@ -206,7 +209,7 @@ let checkPurchases = setInterval(async () => {
             }
         }
     }
-}, 600000);
+}
 
 client.on(Events.ClientReady, client => {
     console.log('Damn I\'m ready now!\nBtw I\'m in ' + client.guilds.cache.size + ' guilds.');
