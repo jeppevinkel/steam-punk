@@ -76,7 +76,6 @@ client.rssHash = new Enmap({
 });
 
 let checkPurchases;
-checkGames().then(() => checkPurchases = setInterval(checkGames, 600000));
 
 async function checkGames() {
     if (!client.isReady()) return;
@@ -225,6 +224,8 @@ client.on(Events.ClientReady, client => {
             client.settings.set(guild.id, currentChannel.id, 'notificationChannelId');
         }
     }
+
+    checkGames().then(() => checkPurchases = setInterval(checkGames, 600000));
 });
 
 client.on(Events.GuildDelete, guild => {
