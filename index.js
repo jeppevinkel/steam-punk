@@ -13,7 +13,7 @@ const client = new Client({
 
 commandManager.default(client, config);
 
-const gameFetchApi = `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${config.steam.apiKey}&steamid={steamid}&format=json&include_appinfo=true`;
+const gameFetchApi = `https://api.steampowered.com/IPlayerService/GetOwnedGames/v0001/?key=${config.steam.apiKey}&steamid={steamid}&format=json&include_appinfo=true&skip_unvetted_apps=false&include_played_free_games=1`;
 const nameFetchApi = `https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${config.steam.apiKey}&format=json&steamids={steamids}`;
 const gameImgApi = 'https://media.steampowered.com/steamcommunity/public/images/apps/{appid}/{hash}.jpg';
 const storeUrl = 'https://store.steampowered.com/app/{appid}/';
