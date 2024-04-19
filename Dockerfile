@@ -1,4 +1,4 @@
-FROM node:slim
+FROM node:18-bookworm-slim
 LABEL authors="Jeppe"
 
 ENV NODE_ENV production
@@ -10,6 +10,7 @@ RUN apt-get update \
         g++ \
         sqlite3 \
         libsqlite3-dev \
+        build-essential \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /steampunk
