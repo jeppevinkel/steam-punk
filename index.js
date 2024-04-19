@@ -1,3 +1,4 @@
+require('dotenv').config();
 const {Client, Events, GatewayIntentBits, EmbedBuilder} = require('discord.js');
 const Enmap = require('enmap');
 const SteamID = require('steamid');
@@ -5,7 +6,15 @@ const fetch = require('node-fetch');
 const rssParser = new (require('rss-parser'))();
 const commandManager = require('./commandManager');
 
-const config = require('./config.json');
+const config = {
+    discord: {
+        token: process.env.DISCORD_TOKEN,
+        clientId: process.env.DISCORD_CLIENT_ID
+    },
+    steam: {
+        apiKey: process.env.STEAM_API_KEY
+    }
+}
 
 const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
