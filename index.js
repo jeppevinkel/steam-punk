@@ -9,12 +9,12 @@ const commandManager = require('./commandManager');
 const config = {
     discord: {
         token: process.env.DISCORD_TOKEN,
-        clientId: process.env.DISCORD_CLIENT_ID
+        clientId: process.env.DISCORD_CLIENT_ID,
     },
     steam: {
-        apiKey: process.env.STEAM_API_KEY
-    }
-}
+        apiKey: process.env.STEAM_API_KEY,
+    },
+};
 
 const client = new Client({
     intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
@@ -234,7 +234,15 @@ client.on(Events.ClientReady, client => {
         }
     }
 
-    checkGames().then(() => checkPurchases = setInterval(checkGames, 600000));
+    checkGames().catch(err => console.error(err));
+
+    checkPurchases = setInterval(async () => {
+        try {
+            await checkGames();
+        } catch (err) {
+            console.error(err);
+        }
+    }, 600000);
 });
 
 client.on(Events.GuildDelete, guild => {
@@ -397,6 +405,12 @@ client.on(Events.MessageCreate, message => {
         \`${client.settings.get(message.guild.id, 'prefix')}conf rss add <search-url> <channel-name> <title>\` adds a steam search rss feed.
         \`${client.settings.get(message.guild.id, 'prefix')}conf rss rem <rss-url>\` removes a steam search rss feed.`);
     }
+});
+
+client.on(Events.Error, err => console.error(err));
+
+client.on(Events.ShardDisconnect, ev => {
+    console.error('DC: ' + ev.code);
 });
 
 client.login(config.discord.token).catch(err => {
