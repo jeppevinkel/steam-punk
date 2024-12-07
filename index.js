@@ -168,6 +168,10 @@ async function checkGames() {
 
                     let embed = new EmbedBuilder();
                     try {
+                        if (price.discount_percent >= 100) {
+                            price.final = 0;
+                        }
+
                         embed.setAuthor({name: 'STEAM DEALS'});
                         embed.setThumbnail(gameImgApi.replace('{appid}', purchase.appid).replace('{hash}', purchase.img_icon_url));
                         embed.setImage(gameImgApi.replace('{appid}', purchase.appid).replace('{hash}', purchase.img_logo_url));
