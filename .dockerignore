@@ -3,3 +3,7 @@ npm-debug.log
 .git
 .gitignore
 .env
+.idea
+dist
+data
+config.json

@@ -13,3 +13,12 @@ services:
     volumes:
       - /local/path:/steampunk/data
 ```
+
+# Development
+Requires Node.js 22.18 or newer. Put the environment variables above in a `.env` file, then:
+```sh
+npm install
+npm run dev     # runs src/ directly with Node's built-in TypeScript support, restarting on changes
+npm run build   # type-checks and compiles to dist/
+npm start       # runs the compiled bot
+```
