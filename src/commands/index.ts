@@ -1,6 +1,7 @@
 import { Collection } from 'discord.js';
 import { channelCommand } from './channel.ts';
 import { configCommand } from './config.ts';
+import { rssCommand } from './rss.ts';
 import { steamIdCommand } from './steamid.ts';
 import type { SlashCommand } from './types.ts';
 
@@ -11,6 +12,7 @@ export const commands: readonly SlashCommand[] = [
     configCommand,
     channelCommand,
     steamIdCommand,
+    rssCommand,
 ];
 
 export const commandsByName = new Collection(commands.map(cmd => [cmd.data.name, cmd]));

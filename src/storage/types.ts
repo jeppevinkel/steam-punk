@@ -2,12 +2,16 @@ export interface RssFeedConfig {
     title: string;
     /** The generated RSS url. Also used to identify the feed when removing it. */
     url: string;
-    /** Name of the channel the feed is posted to. */
-    channel: string;
+    /** ID of the channel the feed is posted to. */
+    channelId?: string;
+    /**
+     * Channel name used by feeds added before channel IDs were stored.
+     * Only used when {@link RssFeedConfig.channelId} is missing.
+     */
+    channel?: string;
 }
 
 export interface GuildSettings {
-    prefix: string;
     notificationChannelId: string;
     steamIds: string[];
     rssFeeds: RssFeedConfig[];
@@ -17,6 +21,11 @@ export interface GuildSettings {
      * @deprecated
      */
     notificationChannel?: string;
+    /**
+     * Command prefix used by the removed text commands. Old records may still contain it.
+     * @deprecated
+     */
+    prefix?: string;
 }
 
 export interface RssHistory {

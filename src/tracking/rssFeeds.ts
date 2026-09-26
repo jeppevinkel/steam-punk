@@ -2,12 +2,14 @@ import type { Guild } from 'discord.js';
 import type { BotContext } from '../context.ts';
 import { extractAppId } from '../rss/steamSearchFeed.ts';
 import type { RssFeedConfig } from '../storage/index.ts';
-import { findSendableChannelByName } from '../util/channels.ts';
+import { findSendableChannelByName, getSendableChannel } from '../util/channels.ts';
 
 async function checkFeed(ctx: BotContext, guild: Guild, feedConfig: RssFeedConfig): Promise<void> {
-    const channel = findSendableChannelByName(guild, feedConfig.channel);
+    const channel = feedConfig.channelId
+        ? getSendableChannel(guild, feedConfig.channelId)
+        : findSendableChannelByName(guild, feedConfig.channel ?? '');
     if (!channel) {
-        console.warn(`Skipping RSS feed "${feedConfig.title}" in ${guild.name}: channel "${feedConfig.channel}" not found.`);
+        console.warn(`Skipping RSS feed "${feedConfig.title}" in ${guild.name}: channel "${feedConfig.channelId ?? feedConfig.channel}" not found.`);
         return;
     }
 

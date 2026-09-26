@@ -1,6 +1,5 @@
 import { Events } from 'discord.js';
 import type { BotContext } from '../context.ts';
-import { handlePrefixCommand } from '../legacy/prefixCommands.ts';
 import type { GameChecker } from '../tracking/GameChecker.ts';
 import { handleInteraction } from './interactionCreate.ts';
 import { handleReady } from './ready.ts';
@@ -21,7 +20,6 @@ export function registerEventHandlers(ctx: BotContext, gameChecker: GameChecker)
     });
 
     client.on(Events.InteractionCreate, safely(interaction => handleInteraction(interaction, ctx)));
-    client.on(Events.MessageCreate, safely(message => handlePrefixCommand(message, ctx)));
 
     client.on(Events.GuildCreate, guild => {
         console.log(`Joined guild: ${guild.name}`);
