@@ -2,9 +2,18 @@
   "name": "steam-punk",
   "version": "1.0.0",
   "description": "Pushes to Discord whenever new game purchases are made by select accounts.",
-  "main": "index.js",
+  "type": "module",
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=22.18"
+  },
   "scripts": {
-    "start": "node index.js"
+    "clean": "node -e \"require('node:fs').rmSync('dist', {recursive: true, force: true})\"",
+    "prebuild": "npm run clean",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "start": "node dist/index.js",
+    "dev": "node --watch src/index.ts"
   },
   "keywords": [],
   "author": "",
@@ -13,8 +22,14 @@
     "discord.js": "^14.27.0",
     "dotenv": "^18.0.4",
     "enmap": "^6.1.6",
-    "node-fetch": "^3.3.2",
     "rss-parser": "^3.13.0",
     "steamid": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.19.0",
+    "typescript": "^5.9.3"
+  },
+  "allowScripts": {
+    "better-sqlite3": true
   }
 }
