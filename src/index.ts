@@ -13,7 +13,7 @@ const config = loadConfig();
 
 const ctx: BotContext = {
     client: new Client({
-        intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent],
+        intents: [GatewayIntentBits.Guilds],
     }),
     config,
     stores: createStores(),

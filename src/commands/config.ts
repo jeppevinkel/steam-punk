@@ -6,6 +6,8 @@ export const configCommand: SlashCommand = {
     data: adminCommand('config', 'Show the current config.'),
 
     async execute(interaction, { stores }) {
-        await interaction.reply(jsonBlock(stores.settings.get(interaction.guildId)));
+        // The prefix is left over from the removed text commands and no longer does anything.
+        const { prefix: _prefix, ...settings } = stores.settings.get(interaction.guildId);
+        await interaction.reply(jsonBlock(settings));
     },
 };
